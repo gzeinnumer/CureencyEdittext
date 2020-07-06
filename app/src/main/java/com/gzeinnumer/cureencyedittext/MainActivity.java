@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                String input = editText.getText().toString();
+                String input = s.toString();
                 input = input.replace(",", "");
                 tv.setText(input);
             }
