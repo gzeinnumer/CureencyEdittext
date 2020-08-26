@@ -5,14 +5,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.text.DecimalFormat;
+import com.gzeinnumer.cureencyedittext.helper.FunctionGlobal;
+
 
 public class MainActivity extends AppCompatActivity {
 
-
+    private static final String TAG = "MainActivity";
     EditText editText;
     TextView tv;
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,27 +32,30 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String input = s.toString();
-                if (!input.isEmpty()) {
-
-                    input = input.replace(",", "");
-
-                    DecimalFormat format = new DecimalFormat("#,###,###");
-                    String newPrice = format.format(Double.parseDouble(input));
-
-                    editText.removeTextChangedListener(this);
-
-                    editText.setText(newPrice);
-                    editText.setSelection(newPrice.length());
-
-                    editText.addTextChangedListener(this);
-                }
 
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-                String input = s.toString();
+            public void afterTextChanged(Editable editable) {
+                editText.removeTextChangedListener(this);
+                String nominal = editText.getText().toString().trim().replace(",", "").replace(".", "");
+                if (!nominal.equals("")) {
+                    try {
+                        int inilen = editText.getText().length();
+                        int cp = editText.getSelectionStart();
+                        editText.setText(FunctionGlobal.formatangka(nominal));
+                        int sel = cp + (editText.getText().length() - inilen);
+                        if (sel <= 0 || sel > editText.getText().length()) {
+                            editText.setSelection(editText.getText().length() - 1);
+                        } else {
+                            editText.setSelection(sel);
+                        }
+                    } catch (NumberFormatException e) {
+                        Log.e(TAG, "afterTextChanged: " + e.getMessage());
+                    }
+                }
+                editText.addTextChangedListener(this);
+                String input = editable.toString();
                 input = input.replace(",", "");
                 tv.setText(input);
             }
